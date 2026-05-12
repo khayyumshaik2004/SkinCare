@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Skin Detector</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .header-bg { background-color: #fcebeb; }
+        .accent-color { background-color: #e59a8c; }
+        .text-accent { color: #cc6b6b; }
+        .shadow-soft { box-shadow: 0 10px 15px -3px rgba(204, 107, 107, 0.1), 0 4px 6px -2px rgba(204, 107, 107, 0.05); }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="header-bg shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <a href="{{ url_for('home') }}" class="text-2xl font-bold text-accent">
+                ✨ {{ text.main_title }}
+            </a>
+            <nav class="space-x-4">
+                <a href="{{ url_for('home') }}" class="font-semibold text-gray-600 hover:text-accent border-b-2 border-transparent hover:border-accent pb-1">{{ text.home }}</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content - Results -->
+    <main class="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-extrabold text-gray-800 tracking-tight mb-2">
+                {{ text.result_title }}
+            </h1>
+            <p class="text-xl text-gray-500">
+                {{ text.result_subtitle }}
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            
+            <!-- Column 1: Prediction Summary & Image -->
+            <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-soft border border-pink-500/30">
+                <h2 class="text-3xl font-bold text-gray-700 mb-6 border-b pb-3 flex items-center">
+                    <span class="text-accent mr-2">🎯</span> {{ text.classification }}
+                </h2>
+
+                <div class="mb-6">
+                    <p class="text-lg text-gray-500 font-semibold">{{ text.predicted_skin_type }}</p>
+                    <span class="inline-block text-4xl font-extrabold text-accent mt-1 p-2 bg-pink-50 rounded-lg">
+                        {{ text.skin_types[skin_type] }} {{ text.skin }}
+                    </span>
+                </div>
+
+                
+                <h3 class="text-xl font-semibold text-gray-700 mb-3 mt-8">{{ text.image_analyzed }}</h3>
+                <div class="rounded-xl overflow-hidden shadow-lg border border-gray-100 mb-6">
+                    <img src="{{ image_url }}" alt="Uploaded Skin Image" class="w-full h-auto object-cover max-h-96">
+                </div>
+
+                <!-- 🎧 Audio Section -->
+                <div class="mt-4 text-center">
+                    <h3 class="text-lg font-bold text-accent mb-2">{{ text.audio_title }}</h3>
+                    <audio controls autoplay class="mx-auto rounded-lg shadow-lg">
+                        <source src="{{ audio_url }}" type="audio/mpeg">
+                        {{ text.audio_not_supported }}
+                    </audio>
+                    <p class="text-sm text-gray-500 mt-2">{{ text.audio_desc }}</p>
+                </div>
+                <!-- 🍎 Skin Foods Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-1 gap-6 mt-12">
+
+                <!-- LEFT: Foods to Eat -->
+                <div class="bg-white p-6 rounded-2xl shadow-soft border border-green-200">
+                    <h2 class="text-2xl font-bold text-green-700 mb-6 flex items-center">
+                        🥗 {{ 'Foods to Eat for Glowing Skin' if lang == 'en' else ('ఆరోగ్యకరమైన చర్మానికి తినాల్సిన ఆహారం' if lang == 'te' else 'स्वस्थ त्वचा के लिए खाने योग्य भोजन') }}
+                    </h2>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-2 gap-6">
+                        {% for item in foods.eat %}
+                        <div class="flex flex-col items-center bg-green-50 p-4 rounded-xl shadow-sm">
+                            <img src="{{ item.image }}" alt="{{ item.name }}" class="w-24 h-24 object-cover rounded-full mb-3 border border-green-300">
+                            <p class="font-semibold text-gray-700 text-center">{{ item.name }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-1 gap-6 mt-12"></div>
+                <!-- RIGHT: Foods to Avoid -->
+                <div class="bg-white p-6 rounded-2xl shadow-soft border border-red-200">
+                    <h2 class="text-2xl font-bold text-red-700 mb-6 flex items-center">
+                        🚫 {{ 'Foods to Avoid for Clear Skin' if lang == 'en' else ('స్పష్టమైన చర్మానికి నివారించాల్సిన ఆహారం' if lang == 'te' else 'साफ त्वचा के लिए परहेज़ वाला भोजन') }}
+                    </h2>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-2 gap-6">
+                        {% for item in foods.avoid %}
+                        <div class="flex flex-col items-center bg-red-50 p-4 rounded-xl shadow-sm">
+                            <img src="{{ item.image }}" alt="{{ item.name }}" class="w-24 h-24 object-cover rounded-full mb-3 border border-red-300">
+                            <p class="font-semibold text-gray-700 text-center">{{ item.name }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Column 2 & 3: Recommendations -->
+            <div class="lg:col-span-2">
+                <div class="bg-white p-8 rounded-2xl shadow-soft border border-gray-100">
+                    <h2 class="text-3xl font-bold text-gray-700 mb-6 border-b pb-3 flex items-center">
+                        <span class="text-accent mr-2">🧪</span> {{text.personal_recommendations}}
+                    </h2>
+                    
+                    {% if skin_type == 'Acne' %}
+                    <div class="p-4 mb-6 bg-yellow-50 border-l-4 border-yellow-500 text-yellow-800 rounded-lg" role="alert">
+                        <p class="font-bold">{{text.important_tip}}:</p>
+                        <p>{{text.acne_tip}}</p>
+                    </div>
+                    {% elif skin_type == 'Dry' %}
+                    <div class="p-4 mb-6 bg-blue-50 border-l-4 border-blue-500 text-blue-800 rounded-lg" role="alert">
+                        <p class="font-bold">{{text.important_tip}}:</p>
+                        <p>{{text.dry_tip}}</p>
+                    </div>
+                    {% elif skin_type == 'Oil' %}
+                    <div class="p-4 mb-6 bg-green-50 border-l-4 border-green-500 text-green-800 rounded-lg" role="alert">
+                        <p class="font-bold">{{text.important_tip}}:</p>
+                        <p>{{text.oil_tip}}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Recommendation List -->
+                     <div class="space-y-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+                            {% for item in recommendations %}
+                            <div class="border border-gray-200 rounded-xl p-4 hover:shadow-lg transition bg-pink-50">
+                                
+                                {% if lang == 'en' %}
+                                    <h3 class="text-lg font-semibold text-pink-800">{{ item.Product_English }}</h3>
+                                {% elif lang == 'te' %}
+                                    <h3 class="text-lg font-semibold text-pink-800">{{ item.Product_Telugu }}</h3>
+                                {% elif lang == 'hi' %}
+                                    <h3 class="text-lg font-semibold text-pink-800">{{ item.Product_Hindi }}</h3>
+                                {% endif %}
+
+                                
+                                <img class="w-full h-56 object-cover mt-2 rounded-lg" src="{{ item.Recommendation }}" alt="{{ item.Product_English }}">
+                                
+                                <a href="{{ item.Website }}" target="_blank"
+                                class="mt-3 inline-block bg-pink-600 hover:bg-pink-700 text-white text-sm font-medium px-4 py-2 rounded-full">
+                                    {{ text.buy_now }}
+                                </a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                </div>
+                    
+                    <div class="mt-10 text-center">
+                         <a href="{{ url_for('home') }}" class="py-3 px-6 text-white font-bold rounded-full accent-color hover:bg-red-500 transition duration-300 shadow-lg shadow-red-200/50">
+                            {{ text.analyze_another }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </main>
+
+    <!-- Footer CTA -->
+    <footer class="accent-color mt-16">
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center text-white">
+            <h3 class="text-xl font-semibold">{{ text.footer_cta }}</h3>
+            <a href="{{ url_for('home') }}" class="mt-4 md:mt-0 px-8 py-3 bg-red-800 hover:bg-red-700 transition duration-300 rounded-full font-bold shadow-md">
+                {{ text.footer_button }}
+            </a>
+        </div>
+    </footer>
+
+</body>
+</html>
